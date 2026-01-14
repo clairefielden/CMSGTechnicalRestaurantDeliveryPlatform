@@ -10,6 +10,9 @@ namespace CMSGTechnical.Mediator.Dtos
 
         public int UserId { get; set; }
 
+        public decimal Subtotal => MenuItems.Sum(item => item.Price);
+        public decimal DeliveryFee => 2.00m;
+        public decimal Total => Subtotal + DeliveryFee;
     }
 
 

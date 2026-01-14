@@ -20,7 +20,7 @@ namespace CMSGTechnical.Mediator.Menu
         public async Task<MenuItemDto?> Handle(GetMenuItem request, CancellationToken cancellationToken)
         {
             var r  = await MenuItems.Get(request.Id, cancellationToken);
-            return r.ToDto();
+            return r is null ? null : r.ToDto();
         }
     }
 
