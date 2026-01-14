@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CMSGTechnical.Domain.Interfaces;
 using CMSGTechnical.Mediator.Dtos;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CMSGTechnical.Mediator.Basket
 {
@@ -23,7 +24,9 @@ namespace CMSGTechnical.Mediator.Basket
 
         public async Task<BasketDto> Handle(GetBasket request, CancellationToken cancellationToken)
         {
-            var r = await Baskets.Get(request.Id, cancellationToken);
+            var r = await Baskets.GetAll()
+                .Include(b => b.MenuItems)
+                .SingleAsync(b => b.Id == request.Id, cancellationToken);
             return r.ToDto();
         }
     }

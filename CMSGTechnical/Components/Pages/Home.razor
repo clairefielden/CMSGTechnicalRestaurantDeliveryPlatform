@@ -10,10 +10,12 @@
 
 
 
-@for (var i = 0; i < MenuItems.Count(); i++) {
-    var item = MenuItems[i];
-    <MenuItemDisplay Item="@item" OnAdd="() => AddItem(i)" />
-}
+<div class="menu-list">
+    @for (var i = 0; i < MenuItems.Length; i++) {
+        var item = MenuItems[i];
+        <MenuItemDisplay Item="@item" OnAdd="() => AddItem(item)" />
+    }
+</div>
 
 
 
@@ -24,7 +26,7 @@
 
     private MenuItemDto[] MenuItems { get; set; } = Array.Empty<MenuItemDto>();
     [CascadingParameter]
-    private BasketService Basket { get; set; }
+    private BasketService Basket { get; set; } = default!;
 
 
     protected override async Task OnInitializedAsync()
@@ -32,10 +34,9 @@
         MenuItems = (await Mediator.Send(new GetMenuItems())).ToArray();
     }
 
-    private void AddItem(int id)
+    private async Task AddItem(MenuItemDto item)
     {
-        var menuItem = MenuItems.First(i=>i.Id==id);
-        Basket.Add(menuItem);
+        await Basket.Add(item);
     }
     
 }

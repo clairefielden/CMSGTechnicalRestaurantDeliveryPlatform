@@ -32,14 +32,14 @@
 
 @code
 {
-    private BasketService BasketService { get; set; }
+    private BasketService BasketService { get; set; } = default!;
 
     [Inject] private IMediator Mediator { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         var basket = await Mediator.Send(new GetBasket(1));
-        BasketService = new BasketService(basket);
+        BasketService = new BasketService(Mediator, basket);
     }
 
 
