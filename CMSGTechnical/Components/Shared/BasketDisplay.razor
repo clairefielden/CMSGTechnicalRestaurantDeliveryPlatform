@@ -1,27 +1,39 @@
-﻿@using CMSGTechnical.Code
+@using CMSGTechnical.Code
 @using CMSGTechnical.Domain.Models
 @using CMSGTechnical.Mediator.Dtos
+@using System.Globalization
 
 <div class="basket">
-    @foreach (var item in Basket.MenuItems)
+    @foreach (var group in Basket.MenuItems.GroupBy(item => item.Id).OrderBy(group => group.Key))
     {
+        var item = group.First();
+        var quantity = group.Count();
+        var lineTotal = item.Price * quantity;
         <div class="basket-item">
-            <div class="basket-item__info">
-                <div class="basket-item__name">@item.Name</div>
-                <div class="basket-item__price">@item.Price</div>
+            <div class="basket-item__name">@item.Name</div>
+            <div class="basket-item__controls">
+                <button class="btn btn-primary btn-round" aria-label="Remove @item.Name" @onclick="() => RemoveItem(item)">-</button>
+                <span class="basket-item__quantity">@quantity</span>
+                <button class="btn btn-primary btn-round" aria-label="Add @item.Name" @onclick="() => AddItem(item)">+</button>
             </div>
-            
-            <div class="basket-item__actions">
-                <button class="btn btn-primary btn-round" @onclick="() => AddItem(item)">+</button>
-                <button class="btn btn-primary btn-round" @onclick="() => RemoveItem(item)">-</button>
-            </div>
+            <div class="basket-item__total">@lineTotal.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</div>
         </div>
     }
-    
+
     <div class="basket-total">
-        <div>Subtotal: @Basket.Subtotal</div>
-        <div>Delivery: @Basket.DeliveryFee</div>
-        <div><strong>Total: @Basket.Total</strong></div>
+        <div class="basket-total__row">
+            <span>Subtotal</span>
+            <span>@Basket.Subtotal.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
+        </div>
+        <div class="basket-total__row">
+            <span>Delivery</span>
+            <span>@Basket.DeliveryFee.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
+        </div>
+        <div class="basket-total__divider" aria-hidden="true"></div>
+        <div class="basket-total__row basket-total__row--total">
+            <span>Total</span>
+            <span>@Basket.Total.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
+        </div>
     </div>
 </div>
 
@@ -57,3 +69,5 @@
 
 
 }
+
+

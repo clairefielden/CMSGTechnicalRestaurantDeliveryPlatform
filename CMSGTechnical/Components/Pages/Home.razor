@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using CMSGTechnical.Code
 @using CMSGTechnical.Domain.Models
 @using CMSGTechnical.Mediator.Menu
@@ -10,13 +10,55 @@
 
 
 
-<div class="menu-list">
-    @for (var i = 0; i < MenuItems.Length; i++) {
-        var item = MenuItems[i];
-        <MenuItemDisplay Item="@item" OnAdd="() => AddItem(item)" />
+<div class="menu-categories">
+    @foreach (var group in MenuItems.GroupBy(item => item.Category).OrderBy(group => group.Key))
+    {
+        var categoryName = group.Key.ToString();
+        var categorySlug = categoryName.ToLowerInvariant();
+        var categoryId = $"category-{categorySlug}";
+        <section class="menu-category">
+            <button class="menu-category__header" type="button" aria-expanded="false" data-target="@categoryId">
+                <div class="menu-category__label">
+                    <span class="menu-category__image menu-category__image--@categorySlug" aria-hidden="true"></span>
+                    <h2 class="menu-category__name">@categoryName</h2>
+                </div>
+                <span class="menu-category__toggle-icon" aria-hidden="true"></span>
+            </button>
+            <div class="menu-category__panel is-collapsed" id="@categoryId">
+                <div class="menu-category__items">
+                    @foreach (var item in group.OrderBy(item => item.Price))
+                    {
+                        <MenuItemDisplay Item="@item" OnAdd="() => AddItem(item)" />
+                    }
+                </div>
+            </div>
+        </section>
     }
 </div>
 
+<script>
+(() => {
+    const buttons = document.querySelectorAll(".menu-category__header");
+    buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const targetId = button.getAttribute("data-target");
+            if (!targetId) {
+                return;
+            }
+
+            const panel = document.getElementById(targetId);
+            if (!panel) {
+                return;
+            }
+
+            const isExpanded = button.getAttribute("aria-expanded") === "true";
+            const willExpand = !isExpanded;
+            button.setAttribute("aria-expanded", String(willExpand));
+            panel.classList.toggle("is-collapsed", !willExpand);
+        });
+    });
+})();
+</script>
 
 
 @code
