@@ -2,18 +2,14 @@
 @using CMSGTechnical.Mediator.Dtos
 @using System.Globalization
 
-<div class="menu-item">
+<div class="menu-item menu-item-card">
     <div class="menu-item__details">
         <div class="menu-item__title">
             <strong>@Item.Name</strong>
             <span class="menu-item__price">@Item.Price.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
         </div>
-        <div class="menu-item__category">
-            @{
-                var categorySlug = Item.Category.ToString().ToLowerInvariant();
-            }
-            <span class="menu-item__category-icon menu-item__category-icon--@categorySlug" aria-hidden="true"></span>
-            <span class="menu-item__category-name">@Item.Category</span>
+        <div class="menu-image menu-image--thumb">
+            <img src="@GetItemImage(Item.Name)" alt="@Item.Name" />
         </div>
 
         @if (!string.IsNullOrWhiteSpace(Item.Description))
@@ -27,6 +23,13 @@
         @if (OnAdd.HasDelegate)
         {
             <button class="btn btn-primary btn-round" @onclick="Add" aria-label="Add item to basket" title="Add to basket">+</button>
+        }
+        @if (AddOnItem is not null && OnAddOn.HasDelegate)
+        {
+            <button class="btn btn-outline-primary menu-item__addon" @onclick="AddOn">
+                <span class="menu-item__addon-label">@GetAddOnLabel(AddOnItem.Name)</span>
+                <span class="menu-item__addon-price">@AddOnItem.Price.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
+            </button>
         }
         @if (OnRemove.HasDelegate)
         {
@@ -47,13 +50,45 @@
     [Parameter]
     public EventCallback<MenuItemDto> OnRemove { get; set; }
 
+    [Parameter] public MenuItemDto? AddOnItem { get; set; }
+
+    [Parameter]
+    public EventCallback<MenuItemDto?> OnAddOn { get; set; }
 
     private async Task Remove() => await OnRemove.InvokeAsync(Item);
     private async Task Add() => await OnAdd.InvokeAsync(Item);
+    private async Task AddOn() => await OnAddOn.InvokeAsync(AddOnItem);
 
+    private static string GetAddOnLabel(string name)
+    {
+        return name switch
+        {
+            "Add Chicken to Caesar Salad" => "Add Chicken",
+            "Add Beef Mince to Carbonara" => "Add Beef Mince",
+            _ => name
+        };
+    }
+
+    private static string GetItemImage(string name)
+    {
+        return name switch
+        {
+            "Margherita Pizza" => "/images/margherita.png",
+            "Caesar Salad" => "/images/caeser_salad.png",
+            "Add Chicken to Caesar Salad" => "/images/caeser_salad.png",
+            "Grilled Salmon" => "/images/salmon.png",
+            "Spaghetti Carbonara" => "/images/spaghetti_carbonara.png",
+            "Add Beef Mince to Carbonara" => "/images/spaghetti_carbonara.png",
+            "Vegetable Stir Fry" => "/images/veg_stirfry.png",
+            "Chicken Parmesan" => "/images/chicken_parmesan.png",
+            "Beef Tacos" => "/images/beef_taco.png",
+            "Clam Chowder" => "/images/clam_chowder.png",
+            "Veggie Burger" => "/images/veggie_burger.png",
+            "Chocolate Cake" => "/images/choc_cake.png",
+            _ => "/images/trolley.png"
+        };
+    }
 
 
 
 }
-
-

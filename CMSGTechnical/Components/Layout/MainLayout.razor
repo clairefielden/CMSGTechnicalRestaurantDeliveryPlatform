@@ -9,20 +9,21 @@
 
 <div class="page">
     <CascadingValue TValue="BasketService" Value="@BasketService">
-        <div class="sidebar">
-            <NavMenu/>
-        </div>
+        <header class="top-row">
+            <div class="top-row__inner px-4">
+                <div class="top-row__title">CMSGTechnical Restaurant Delivery Platform</div>
+                <div class="top-row__actions">
+                    <button class="basket-toggle" type="button" @onclick="ToggleBasket" aria-expanded="@IsBasketOpen" aria-controls="basket-drawer">
+                        <span class="basket-toggle__icon" aria-hidden="true"></span>
+                        <span class="basket-toggle__label">Basket (@Basket.MenuItems.Count)</span>
+                        <span class="basket-toggle__total">@Basket.Total.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-GB"))</span>
+                    </button>
+                    <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+                </div>
+            </div>
+        </header>
 
         <main>
-            <div class="top-row px-4">
-                <button class="basket-toggle" type="button" @onclick="ToggleBasket" aria-expanded="@IsBasketOpen" aria-controls="basket-drawer">
-                    <span class="basket-toggle__icon" aria-hidden="true"></span>
-                    <span class="basket-toggle__label">Basket (@Basket.MenuItems.Count)</span>
-                    <span class="basket-toggle__total">@Basket.Total.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-GB"))</span>
-                </button>
-                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-            </div>
-
             <article class="content px-4">
                 @Body
             </article>

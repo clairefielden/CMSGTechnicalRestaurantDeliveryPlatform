@@ -46,6 +46,14 @@ internal static class SeedDataHelper
             new
             {
                 Id = id++, Order = 0,
+                Name = "Add Chicken to Caesar Salad",
+                Description = "Add-on: grilled chicken for Caesar Salad.",
+                Price = 2.50m,
+                Category = MenuItemCategory.Poultry
+            },
+            new
+            {
+                Id = id++, Order = 0,
                 Name = "Grilled Salmon",
                 Description = "Grilled salmon fillet served with a side of roasted vegetables.",
                 Price = 18.99m,
@@ -57,6 +65,14 @@ internal static class SeedDataHelper
                 Name = "Spaghetti Carbonara",
                 Description = "Pasta in a creamy sauce with pancetta, parmesan cheese, and black pepper.",
                 Price = 14.99m,
+                Category = MenuItemCategory.Beef
+            },
+            new
+            {
+                Id = id++, Order = 0,
+                Name = "Add Beef Mince to Carbonara",
+                Description = "Add-on: beef mince for Spaghetti Carbonara.",
+                Price = 3.00m,
                 Category = MenuItemCategory.Beef
             },
             new

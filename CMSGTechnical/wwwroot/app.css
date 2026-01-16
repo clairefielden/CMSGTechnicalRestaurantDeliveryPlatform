@@ -1,5 +1,5 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
 a, .btn-link {
@@ -55,4 +55,9 @@ h1:focus {
     height: 2rem;
     width: 2rem;
     line-height: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    line-height: 1;
 }
