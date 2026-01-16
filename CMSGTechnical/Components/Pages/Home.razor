@@ -8,10 +8,15 @@
 
 <PageTitle>Home</PageTitle>
 
-
-
 <div class="menu-categories">
-    @foreach (var group in MenuItems.GroupBy(item => item.Category).OrderBy(group => group.Key))
+    @{
+        var caesarAddOn = MenuItems.FirstOrDefault(item => item.Name == "Add Chicken to Caesar Salad");
+        var carbonaraAddOn = MenuItems.FirstOrDefault(item => item.Name == "Add Beef Mince to Carbonara");
+        var menuItems = MenuItems.Where(item =>
+            item.Name != "Add Chicken to Caesar Salad" &&
+            item.Name != "Add Beef Mince to Carbonara");
+    }
+    @foreach (var group in menuItems.GroupBy(item => item.Category).OrderBy(group => group.Key))
     {
         var categoryName = group.Key.ToString();
         var categorySlug = categoryName.ToLowerInvariant();
@@ -28,7 +33,16 @@
                 <div class="menu-category__items">
                     @foreach (var item in group.OrderBy(item => item.Price))
                     {
-                        <MenuItemDisplay Item="@item" OnAdd="() => AddItem(item)" />
+                        var addOnItem = item.Name switch
+                        {
+                            "Caesar Salad" => caesarAddOn,
+                            "Spaghetti Carbonara" => carbonaraAddOn,
+                            _ => null
+                        };
+                        <MenuItemDisplay Item="@item"
+                                         OnAdd="() => AddItem(item)"
+                                         AddOnItem="@addOnItem"
+                                         OnAddOn="() => AddAddOn(addOnItem)" />
                     }
                 </div>
             </div>
@@ -78,6 +92,16 @@
 
     private async Task AddItem(MenuItemDto item)
     {
+        await Basket.Add(item);
+    }
+
+    private async Task AddAddOn(MenuItemDto? item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
         await Basket.Add(item);
     }
     
