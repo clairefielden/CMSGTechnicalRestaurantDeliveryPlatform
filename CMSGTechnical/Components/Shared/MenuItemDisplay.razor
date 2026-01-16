@@ -1,14 +1,19 @@
-﻿@using CMSGTechnical.Domain.Models
+@using CMSGTechnical.Domain.Models
 @using CMSGTechnical.Mediator.Dtos
+@using System.Globalization
 
 <div class="menu-item">
     <div class="menu-item__details">
         <div class="menu-item__title">
             <strong>@Item.Name</strong>
-            <span class="menu-item__price">ś@Item.Price</span>
+            <span class="menu-item__price">@Item.Price.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
         </div>
         <div class="menu-item__category">
-            @Item.Category
+            @{
+                var categorySlug = Item.Category.ToString().ToLowerInvariant();
+            }
+            <span class="menu-item__category-icon menu-item__category-icon--@categorySlug" aria-hidden="true"></span>
+            <span class="menu-item__category-name">@Item.Category</span>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(Item.Description))
@@ -21,7 +26,7 @@
     <div class="menu-item__actions">
         @if (OnAdd.HasDelegate)
         {
-            <button class="btn btn-primary btn-round" @onclick="Add">+</button>
+            <button class="btn btn-primary btn-round" @onclick="Add" aria-label="Add item to basket" title="Add to basket">+</button>
         }
         @if (OnRemove.HasDelegate)
         {
@@ -50,3 +55,5 @@
 
 
 }
+
+

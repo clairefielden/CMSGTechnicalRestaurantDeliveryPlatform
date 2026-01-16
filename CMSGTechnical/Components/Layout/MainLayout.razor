@@ -2,8 +2,10 @@
 @using CMSGTechnical.Components.Shared
 @using CMSGTechnical.Domain.Models
 @using CMSGTechnical.Mediator.Basket
+@using CMSGTechnical.Mediator.Dtos
 @using MediatR
 @inherits LayoutComponentBase
+@implements IDisposable
 
 <div class="page">
     <CascadingValue TValue="BasketService" Value="@BasketService">
@@ -13,6 +15,11 @@
 
         <main>
             <div class="top-row px-4">
+                <button class="basket-toggle" type="button" @onclick="ToggleBasket" aria-expanded="@IsBasketOpen" aria-controls="basket-drawer">
+                    <span class="basket-toggle__icon" aria-hidden="true"></span>
+                    <span class="basket-toggle__label">Basket (@Basket.MenuItems.Count)</span>
+                    <span class="basket-toggle__total">@Basket.Total.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-GB"))</span>
+                </button>
                 <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
             </div>
 
@@ -20,6 +27,17 @@
                 @Body
             </article>
         </main>
+
+        <button class="basket-drawer__scrim @(IsBasketOpen ? "is-open" : string.Empty)" type="button" @onclick="CloseBasket" aria-hidden="true"></button>
+        <aside class="basket-drawer @(IsBasketOpen ? "is-open" : string.Empty)" id="basket-drawer" role="dialog" aria-label="Basket">
+            <div class="basket-drawer__header">
+                <div class="basket-drawer__title">Your basket</div>
+                <button class="basket-drawer__close" type="button" @onclick="CloseBasket">Close</button>
+            </div>
+            <div class="basket-drawer__content">
+                <BasketDisplay />
+            </div>
+        </aside>
     </CascadingValue>
 </div>
 
@@ -33,6 +51,8 @@
 @code
 {
     private BasketService BasketService { get; set; } = default!;
+    private BasketDto Basket { get; set; } = new();
+    private bool IsBasketOpen { get; set; }
 
     [Inject] private IMediator Mediator { get; set; } = default!;
 
@@ -40,7 +60,31 @@
     {
         var basket = await Mediator.Send(new GetBasket(1));
         BasketService = new BasketService(Mediator, basket);
+        Basket = BasketService.Basket;
+        BasketService.OnChange += HandleBasketChange;
     }
 
+    private void HandleBasketChange(object? sender, BasketChangedEventArgs args)
+    {
+        Basket = args.Basket;
+        InvokeAsync(StateHasChanged);
+    }
 
+    private void ToggleBasket()
+    {
+        IsBasketOpen = !IsBasketOpen;
+    }
+
+    private void CloseBasket()
+    {
+        IsBasketOpen = false;
+    }
+
+    public void Dispose()
+    {
+        if (BasketService != null)
+        {
+            BasketService.OnChange -= HandleBasketChange;
+        }
+    }
 }

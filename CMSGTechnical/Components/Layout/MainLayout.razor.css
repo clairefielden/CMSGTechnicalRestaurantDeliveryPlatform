@@ -15,10 +15,11 @@ main {
 .top-row {
     background-color: #f7f7f7;
     border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
+    justify-content: space-between;
     height: 3.5rem;
     display: flex;
     align-items: center;
+    gap: 1rem;
 }
 
     .top-row ::deep a, .top-row ::deep .btn-link {
@@ -35,6 +36,104 @@ main {
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+.basket-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(31, 58, 95, 0.2);
+    background: linear-gradient(135deg, #1f3a5f, #2f568f);
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.basket-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(31, 58, 95, 0.2);
+}
+
+.basket-toggle__icon {
+    width: 1.3rem;
+    height: 1.3rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1.2rem 1.2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='21' r='1'/%3E%3Ccircle cx='20' cy='21' r='1'/%3E%3Cpath d='M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6'/%3E%3C/svg%3E");
+}
+
+.basket-toggle__total {
+    opacity: 0.9;
+}
+
+.basket-drawer__scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 30, 48, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    border: 0;
+    z-index: 300;
+    transition: opacity 0.2s ease;
+}
+
+.basket-drawer__scrim.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.basket-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: min(420px, 92vw);
+    background: linear-gradient(180deg, #0f2d52 0%, #1f3a5f 80%);
+    color: #ffffff;
+    box-shadow: -20px 0 40px rgba(15, 30, 48, 0.35);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+}
+
+.basket-drawer.is-open {
+    transform: translateX(0);
+}
+
+.basket-drawer__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.basket-drawer__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.basket-drawer__close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.basket-drawer__content {
+    padding: 1rem 1.25rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
 
 @media (max-width: 640.98px) {
     .top-row {
