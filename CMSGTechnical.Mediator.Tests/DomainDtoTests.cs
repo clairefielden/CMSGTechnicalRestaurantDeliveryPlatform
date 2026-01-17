@@ -27,7 +27,15 @@ public class DomainDtoTests
     public void BasketExtensionsMapModelToDto()
     {
         var menuItem = new MenuItem { Id = 3, Name = "Pizza", Price = 9.99m };
-        var basket = new BasketModel { Id = 7, UserId = 2, MenuItems = new List<MenuItem> { menuItem } };
+        var basket = new BasketModel
+        {
+            Id = 7,
+            UserId = 2,
+            Items = new List<BasketItem>
+            {
+                new() { MenuItem = menuItem, MenuItemId = menuItem.Id, Quantity = 1 }
+            }
+        };
 
         var dto = basket.ToDto();
 

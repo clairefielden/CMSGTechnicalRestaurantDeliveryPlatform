@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# CMSGTechnicalRestaurantDeliveryPlatform
-The project simulates a restaurant e-commerce / delivery platform, with a focus on the menu and basket experience. It assumes the user is already authenticated and that menu data is supplied from a backend service containing only items the user is authorised to view or modify.
-=======
 # CMSGTechnical :fork_and_knife:
 
 An ASP.NET Core (Razor Components + server hosting) app for a menu and basket flow, with MediatR handlers and EF Core data access.
@@ -10,7 +6,7 @@ An ASP.NET Core (Razor Components + server hosting) app for a menu and basket fl
 - Menu browsing by category with image-backed icons.
 - Add and remove menu items to basket.
 - Group items in basket according to quantities.
-- Slide-out basket drawer with a chekout button.
+- Slide-out basket drawer with a checkout button.
 - Clean separation across UI, domain, mediator, and repository layers.
 
 ## Project Structure :compass:
@@ -65,6 +61,24 @@ The data layer uses EF Core InMemory by default.
 - Basket drawer and toggle are in `CMSGTechnical/Components/Layout/MainLayout.razor(.css)`.
 - Basket item rendering is in `CMSGTechnical/Components/Shared/BasketDisplay.razor(.css)`.
 
+## Testing Notes :test_tube:
+- Unit tests live in `CMSGTechnical.Mediator.Tests/` and target MediatR handlers and DTOs.
+- Tests use xUnit and validate ordering, totals, and persistence rules in the handler layer.
+- Run a focused suite during development (`dotnet test CMSGTechnical.Mediator.Tests/CMSGTechnical.Mediator.Tests.csproj`) and the full solution with coverage before sharing changes (`dotnet test CMSGTechnical.sln --collect:"XPlat Code Coverage"`).
+
+## Bootstrap Details :wrench:
+Bootstrap provides the base typography, layout utilities, and form/control styling for the UI. The app ships Bootstrap as a local static asset under `CMSGTechnical/wwwroot/bootstrap/` rather than pulling from a CDN.
+
+Implementation details:
+- `CMSGTechnical/Components/App.razor` links `bootstrap/bootstrap.min.css` in the document `<head>` before `app.css` and `CMSGTechnical.styles.css` so custom styles can override defaults.
+- `Program.cs` enables static file serving (`app.UseStaticFiles()`), which makes the `wwwroot/` Bootstrap assets available at runtime.
+- Razor components are compiled into `CMSGTechnical.styles.css`, allowing component-level styles.
+
+## Scalability Notes :chart_with_upwards_trend:
+- Added a `BasketItem` join entity with quantities so basket growth does not rely on duplicate entity entries and scales cleanly in EF Core.
+- Kept the domain, mediator, and repository layers separate so workflow changes or new data stores can evolve independently.
+- Centralized basket mutations in MediatR handlers and DTO mapping to keep UI-facing shapes stable as persistence changes.
+- The repository abstraction and EF Core configuration make it straightforward to swap providers (InMemory to a relational store) without refactoring handlers.
+
 ## Contributing :handshake:
 Keep changes focused and match existing naming and formatting conventions. For UI tweaks, add screenshots or GIFs showing the results.
->>>>>>> a591ea9 (Added tests and README)

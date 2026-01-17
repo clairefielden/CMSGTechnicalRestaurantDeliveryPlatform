@@ -21,15 +21,16 @@
         var categoryName = group.Key.ToString();
         var categorySlug = categoryName.ToLowerInvariant();
         var categoryId = $"category-{categorySlug}";
+        var isExpanded = ExpandedCategories.Contains(categorySlug);
         <section class="menu-category">
-            <button class="menu-category__header" type="button" aria-expanded="false" data-target="@categoryId">
+            <button class="menu-category__header" type="button" aria-expanded="@isExpanded" @onclick="() => ToggleCategory(categorySlug)">
                 <div class="menu-category__label">
                     <span class="menu-category__image menu-category__image--@categorySlug" aria-hidden="true"></span>
                     <h2 class="menu-category__name">@categoryName</h2>
                 </div>
                 <span class="menu-category__toggle-icon" aria-hidden="true"></span>
             </button>
-            <div class="menu-category__panel is-collapsed" id="@categoryId">
+            <div class="menu-category__panel @(isExpanded ? string.Empty : "is-collapsed")" id="@categoryId">
                 <div class="menu-category__items">
                     @foreach (var item in group.OrderBy(item => item.Price))
                     {
@@ -50,30 +51,6 @@
     }
 </div>
 
-<script>
-(() => {
-    const buttons = document.querySelectorAll(".menu-category__header");
-    buttons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const targetId = button.getAttribute("data-target");
-            if (!targetId) {
-                return;
-            }
-
-            const panel = document.getElementById(targetId);
-            if (!panel) {
-                return;
-            }
-
-            const isExpanded = button.getAttribute("aria-expanded") === "true";
-            const willExpand = !isExpanded;
-            button.setAttribute("aria-expanded", String(willExpand));
-            panel.classList.toggle("is-collapsed", !willExpand);
-        });
-    });
-})();
-</script>
-
 
 @code
 {
@@ -84,6 +61,7 @@
     [CascadingParameter]
     private BasketService Basket { get; set; } = default!;
 
+    private HashSet<string> ExpandedCategories { get; } = new(StringComparer.Ordinal);
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,6 +81,14 @@
         }
 
         await Basket.Add(item);
+    }
+
+    private void ToggleCategory(string categorySlug)
+    {
+        if (!ExpandedCategories.Add(categorySlug))
+        {
+            ExpandedCategories.Remove(categorySlug);
+        }
     }
     
 }

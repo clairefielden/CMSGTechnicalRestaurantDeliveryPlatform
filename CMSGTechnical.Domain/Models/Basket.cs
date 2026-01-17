@@ -10,7 +10,7 @@ namespace CMSGTechnical.Domain.Models
     public class Basket : IEntity
     {
         public int Id { get; set; }
-        public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
+        public ICollection<BasketItem> Items { get; set; } = new List<BasketItem>();
 
         public int UserId { get; set; }
 

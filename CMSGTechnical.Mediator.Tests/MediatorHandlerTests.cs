@@ -41,8 +41,8 @@ public class MediatorHandlerTests
     {
         using var context = TestDbFactory.CreateContext();
         var basket = new BasketModel { UserId = 1 };
-        var menuItem = new MenuItem { Name = "Item A", Price = 2.00m };
-        basket.MenuItems.Add(menuItem);
+        var menuItem = new MenuItem { Id = 1, Name = "Item A", Price = 2.00m };
+        basket.Items.Add(new BasketItem { MenuItem = menuItem, MenuItemId = menuItem.Id, Quantity = 1 });
         context.AddRange(basket, menuItem);
         await context.SaveChangesAsync();
 
@@ -50,7 +50,7 @@ public class MediatorHandlerTests
         var handler = new GetBasketHandler(repo);
         var result = await handler.Handle(new GetBasket(basket.Id), CancellationToken.None);
 
-        Assert.Equal(1, result.MenuItems.Count);
+        Assert.Single(result.MenuItems);
     }
 
     [Fact]
@@ -94,14 +94,14 @@ public class MediatorHandlerTests
     public async Task RemoveItemFromBasketRemovesMenuItem()
     {
         using var context = TestDbFactory.CreateContext();
-        var menuItem = new MenuItem { Name = "Item A", Price = 2.00m };
-        var basket = new BasketModel { UserId = 1, MenuItems = new List<MenuItem> { menuItem } };
+        var menuItem = new MenuItem { Id = 1, Name = "Item A", Price = 2.00m };
+        var basket = new BasketModel { UserId = 1 };
+        basket.Items.Add(new BasketItem { MenuItem = menuItem, MenuItemId = menuItem.Id, Quantity = 1 });
         context.AddRange(basket, menuItem);
         await context.SaveChangesAsync();
 
         var basketRepo = new Repo<BasketModel>(context);
-        var menuRepo = new Repo<MenuItem>(context);
-        var handler = new RemoveItemFromBasketHandler(basketRepo, menuRepo);
+        var handler = new RemoveItemFromBasketHandler(basketRepo);
 
         var result = await handler.Handle(new RemoveItemFromBasket(basket.Id, menuItem.Id), CancellationToken.None);
 
@@ -109,7 +109,7 @@ public class MediatorHandlerTests
     }
 
     [Fact]
-    public async Task RemoveItemFromBasketThrowsWhenMissingMenuItem()
+    public async Task RemoveItemFromBasketReturnsBasketWhenMissingMenuItem()
     {
         using var context = TestDbFactory.CreateContext();
         var basket = new BasketModel { UserId = 1 };
@@ -117,12 +117,10 @@ public class MediatorHandlerTests
         await context.SaveChangesAsync();
 
         var basketRepo = new Repo<BasketModel>(context);
-        var menuRepo = new Repo<MenuItem>(context);
-        var handler = new RemoveItemFromBasketHandler(basketRepo, menuRepo);
+        var handler = new RemoveItemFromBasketHandler(basketRepo);
 
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await handler.Handle(new RemoveItemFromBasket(basket.Id, 456), CancellationToken.None));
+        var result = await handler.Handle(new RemoveItemFromBasket(basket.Id, 456), CancellationToken.None);
 
-        Assert.Contains("Menu item 456 was not found.", ex.Message);
+        Assert.Empty(result.MenuItems);
     }
 }

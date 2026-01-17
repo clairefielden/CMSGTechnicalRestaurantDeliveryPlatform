@@ -25,10 +25,15 @@ namespace CMSGTechnical.Mediator.Dtos
 
         public static BasketDto ToDto(this Domain.Models.Basket model)
         {
+            var menuItems = model.Items
+                .Where(item => item.MenuItem != null)
+                .SelectMany(item => Enumerable.Repeat(item.MenuItem.ToDto(), item.Quantity))
+                .ToList();
+
             return new BasketDto()
             {
                 Id = model.Id,
-                MenuItems = model.MenuItems.ToDto().ToList(),
+                MenuItems = menuItems,
                 UserId = model.UserId
             };
         }
