@@ -2,6 +2,7 @@ using CMSGTechnical.Domain.Models;
 using CMSGTechnical.Mediator.Tests.TestHelpers;
 using CMSGTechnical.Repository;
 using Microsoft.EntityFrameworkCore;
+using BasketModel = CMSGTechnical.Domain.Models.Basket;
 
 namespace CMSGTechnical.Mediator.Tests;
 
@@ -14,7 +15,7 @@ public class RepositoryTests
         context.Database.EnsureCreated();
 
         var menuItems = context.Set<MenuItem>().ToList();
-        var baskets = context.Set<Basket>().ToList();
+        var baskets = context.Set<BasketModel>().ToList();
 
         Assert.True(menuItems.Count >= 12);
         Assert.True(baskets.Count >= 1);

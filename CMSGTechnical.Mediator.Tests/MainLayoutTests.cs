@@ -4,6 +4,7 @@ using CMSGTechnical.Mediator.Basket;
 using CMSGTechnical.Mediator.Dtos;
 using CMSGTechnical.Mediator.Tests.TestHelpers;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CMSGTechnical.Mediator.Tests;
 
@@ -66,11 +67,14 @@ public class MainLayoutTests : TestContext
         var basketService = basketServiceProperty!.GetValue(cut.Instance) as CMSGTechnical.Code.BasketService;
         Assert.NotNull(basketService);
 
-        await basketService!.Add(menuItem);
-
         var expectedTotal = 4.00m.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-GB"));
 
-        Assert.Contains("Basket (1)", cut.Markup);
-        Assert.Contains(expectedTotal, cut.Markup);
+        await cut.InvokeAsync(() => basketService!.Add(menuItem));
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("Basket (1)", cut.Markup);
+            Assert.Contains(expectedTotal, cut.Markup);
+        });
     }
 }

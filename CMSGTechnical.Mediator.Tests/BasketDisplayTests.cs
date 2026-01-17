@@ -55,9 +55,17 @@ public class BasketDisplayTests : TestContext
             .AddCascadingValue(basketService));
 
         cut.Find("button[aria-label='Add Item']").Click();
-        Assert.Contains("2", cut.Markup);
+        cut.WaitForAssertion(() =>
+        {
+            var quantity = cut.Find(".basket-item__quantity").TextContent;
+            Assert.Equal("2", quantity);
+        });
 
         cut.Find("button[aria-label='Remove Item']").Click();
-        Assert.DoesNotContain("2", cut.Markup);
+        cut.WaitForAssertion(() =>
+        {
+            var quantities = cut.FindAll(".basket-item__quantity");
+            Assert.Empty(quantities);
+        });
     }
 }

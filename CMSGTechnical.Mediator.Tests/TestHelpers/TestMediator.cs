@@ -22,6 +22,12 @@ public sealed class TestMediator : IMediator
         return _send(request, cancellationToken);
     }
 
+    public Task Send<TRequest>(TRequest request, CancellationToken cancellationToken = default)
+        where TRequest : IRequest
+    {
+        return _send(request!, cancellationToken);
+    }
+
     public Task Publish(object notification, CancellationToken cancellationToken = default)
     {
         return Task.CompletedTask;
