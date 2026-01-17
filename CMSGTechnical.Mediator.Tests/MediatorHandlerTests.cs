@@ -4,6 +4,7 @@ using CMSGTechnical.Mediator.Menu;
 using CMSGTechnical.Mediator.Tests.TestHelpers;
 using CMSGTechnical.Repository;
 using Microsoft.EntityFrameworkCore;
+using BasketModel = CMSGTechnical.Domain.Models.Basket;
 
 namespace CMSGTechnical.Mediator.Tests;
 
@@ -39,13 +40,13 @@ public class MediatorHandlerTests
     public async Task GetBasketReturnsBasketWithItems()
     {
         using var context = TestDbFactory.CreateContext();
-        var basket = new Basket { UserId = 1 };
+        var basket = new BasketModel { UserId = 1 };
         var menuItem = new MenuItem { Name = "Item A", Price = 2.00m };
         basket.MenuItems.Add(menuItem);
         context.AddRange(basket, menuItem);
         await context.SaveChangesAsync();
 
-        var repo = new Repo<Basket>(context);
+        var repo = new Repo<BasketModel>(context);
         var handler = new GetBasketHandler(repo);
         var result = await handler.Handle(new GetBasket(basket.Id), CancellationToken.None);
 
@@ -56,12 +57,12 @@ public class MediatorHandlerTests
     public async Task AddItemToBasketAddsMenuItem()
     {
         using var context = TestDbFactory.CreateContext();
-        var basket = new Basket { UserId = 1 };
+        var basket = new BasketModel { UserId = 1 };
         var menuItem = new MenuItem { Name = "Item A", Price = 2.00m };
         context.AddRange(basket, menuItem);
         await context.SaveChangesAsync();
 
-        var basketRepo = new Repo<Basket>(context);
+        var basketRepo = new Repo<BasketModel>(context);
         var menuRepo = new Repo<MenuItem>(context);
         var handler = new AddItemToBasketHandler(basketRepo, menuRepo);
 
@@ -75,11 +76,11 @@ public class MediatorHandlerTests
     public async Task AddItemToBasketThrowsWhenMissingMenuItem()
     {
         using var context = TestDbFactory.CreateContext();
-        var basket = new Basket { UserId = 1 };
+        var basket = new BasketModel { UserId = 1 };
         context.Add(basket);
         await context.SaveChangesAsync();
 
-        var basketRepo = new Repo<Basket>(context);
+        var basketRepo = new Repo<BasketModel>(context);
         var menuRepo = new Repo<MenuItem>(context);
         var handler = new AddItemToBasketHandler(basketRepo, menuRepo);
 
@@ -94,11 +95,11 @@ public class MediatorHandlerTests
     {
         using var context = TestDbFactory.CreateContext();
         var menuItem = new MenuItem { Name = "Item A", Price = 2.00m };
-        var basket = new Basket { UserId = 1, MenuItems = new List<MenuItem> { menuItem } };
+        var basket = new BasketModel { UserId = 1, MenuItems = new List<MenuItem> { menuItem } };
         context.AddRange(basket, menuItem);
         await context.SaveChangesAsync();
 
-        var basketRepo = new Repo<Basket>(context);
+        var basketRepo = new Repo<BasketModel>(context);
         var menuRepo = new Repo<MenuItem>(context);
         var handler = new RemoveItemFromBasketHandler(basketRepo, menuRepo);
 
@@ -111,11 +112,11 @@ public class MediatorHandlerTests
     public async Task RemoveItemFromBasketThrowsWhenMissingMenuItem()
     {
         using var context = TestDbFactory.CreateContext();
-        var basket = new Basket { UserId = 1 };
+        var basket = new BasketModel { UserId = 1 };
         context.Add(basket);
         await context.SaveChangesAsync();
 
-        var basketRepo = new Repo<Basket>(context);
+        var basketRepo = new Repo<BasketModel>(context);
         var menuRepo = new Repo<MenuItem>(context);
         var handler = new RemoveItemFromBasketHandler(basketRepo, menuRepo);
 

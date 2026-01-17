@@ -1,5 +1,6 @@
 using CMSGTechnical.Domain.Models;
 using CMSGTechnical.Mediator.Dtos;
+using BasketModel = CMSGTechnical.Domain.Models.Basket;
 
 namespace CMSGTechnical.Mediator.Tests;
 
@@ -26,7 +27,7 @@ public class DomainDtoTests
     public void BasketExtensionsMapModelToDto()
     {
         var menuItem = new MenuItem { Id = 3, Name = "Pizza", Price = 9.99m };
-        var basket = new Basket { Id = 7, UserId = 2, MenuItems = new List<MenuItem> { menuItem } };
+        var basket = new BasketModel { Id = 7, UserId = 2, MenuItems = new List<MenuItem> { menuItem } };
 
         var dto = basket.ToDto();
 

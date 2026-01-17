@@ -7,6 +7,7 @@ using CMSGTechnical.Mediator.Dtos;
 using CMSGTechnical.Mediator.Menu;
 using CMSGTechnical.Mediator.Tests.TestHelpers;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CMSGTechnical.Mediator.Tests;
 
@@ -25,16 +26,17 @@ public class HomeComponentTests : TestContext
 
         var basket = new BasketDto { Id = 1 };
         var addCalled = false;
+        Task<object?> HandleAdd()
+        {
+            addCalled = true;
+            return Task.FromResult<object?>(basket);
+        }
         var mediator = new TestMediator((request, _) =>
         {
             return request switch
             {
                 GetMenuItems => Task.FromResult<object?>(menuItems),
-                AddItemToBasket =>
-                {
-                    addCalled = true;
-                    return Task.FromResult<object?>(basket);
-                }
+                AddItemToBasket => HandleAdd(),
                 RemoveItemFromBasket => Task.FromResult<object?>(basket),
                 _ => Task.FromResult<object?>(basket)
             };
