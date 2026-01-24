@@ -9,33 +9,36 @@ namespace CMSGTechnical.Code
 
     public class BasketChangedEventArgs : EventArgs
     {
-        public BasketDto Basket { get; set; }
+        public BasketDto Basket { get; set; } = new();
     }
 
 
     public class BasketService
     {
 
-        public event EventHandler<BasketChangedEventArgs> OnChange;
+        public event EventHandler<BasketChangedEventArgs>? OnChange;
 
-        public BasketDto Basket { get; }
+        private IMediator Mediator { get; }
 
-        public BasketService(BasketDto basket)
+        public BasketDto Basket { get; private set; }
+
+        public BasketService(IMediator mediator, BasketDto basket)
         {
+            Mediator = mediator;
             Basket = basket;
         }
 
 
         public async Task Add(MenuItemDto item)
         {
-            Basket.MenuItems.Add(item);
-            OnChange(this, new BasketChangedEventArgs(){Basket = Basket});
+            Basket = await Mediator.Send(new AddItemToBasket(Basket.Id, item.Id));
+            OnChange?.Invoke(this, new BasketChangedEventArgs { Basket = Basket });
         }
 
         public async Task Remove(MenuItemDto item)
         {
-            Basket.MenuItems.Remove(item);
-            OnChange(this, new BasketChangedEventArgs() { Basket = Basket });
+            Basket = await Mediator.Send(new RemoveItemFromBasket(Basket.Id, item.Id));
+            OnChange?.Invoke(this, new BasketChangedEventArgs { Basket = Basket });
         }
 
     }

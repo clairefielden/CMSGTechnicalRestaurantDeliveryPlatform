@@ -1,29 +1,45 @@
-﻿@using CMSGTechnical.Code
+@using CMSGTechnical.Code
 @using CMSGTechnical.Domain.Models
-@using CMSGTechnical.Mediator.Basket
 @using CMSGTechnical.Mediator.Dtos
-@using MediatR
+@using System.Globalization
 
 <div class="basket">
-    
-    @foreach (var item in Basket.MenuItems)
+    @foreach (var group in Basket.MenuItems.GroupBy(item => item.Id).OrderBy(group => group.Key))
     {
-
-        <div>
-            <div>
-                @item.Name - @item.Price
+        var item = group.First();
+        var quantity = group.Count();
+        var lineTotal = item.Price * quantity;
+        <div class="basket-item">
+            <div class="basket-item__name">@item.Name</div>
+            <div class="basket-item__controls">
+                <button class="btn btn-primary btn-round" aria-label="Remove @item.Name" @onclick="() => RemoveItem(item)">-</button>
+                <span class="basket-item__quantity">@quantity</span>
+                <button class="btn btn-primary btn-round" aria-label="Add @item.Name" @onclick="() => AddItem(item)">+</button>
             </div>
-            
-            <div>
-                <button class="btn btn-primary btn-round" @onclick="() => Basket.MenuItems.Add(item)">+</button>
-                <button class="btn btn-primary btn-round" @onclick="() => Basket.MenuItems.Remove(item)">-</button>
-            </div>
+            <div class="basket-item__total">@lineTotal.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</div>
         </div>
     }
-    
-    <div class="mt-3">
-        Total: @Basket.MenuItems.Sum(i=>i.Price)
+
+    <div class="basket-total">
+        <div class="basket-total__row">
+            <span>Subtotal</span>
+            <span>@Basket.Subtotal.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
+        </div>
+        <div class="basket-total__row">
+            <span>Delivery</span>
+            <span>@Basket.DeliveryFee.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
+        </div>
+        <div class="basket-total__divider" aria-hidden="true"></div>
+        <div class="basket-total__row basket-total__row--total">
+            <span>Total</span>
+            <span>@Basket.Total.ToString("C", CultureInfo.GetCultureInfo("en-GB"))</span>
+        </div>
     </div>
+
+    <button class="basket-checkout" type="button">
+        <span class="basket-checkout__icon" aria-hidden="true"></span>
+        Checkout
+    </button>
 </div>
 
 
@@ -31,29 +47,32 @@
 
 
 
-    [Inject] private IMediator Mediator { get; set; } = default!;
-
     private BasketDto Basket { get; set; } = new();
     [CascadingParameter]
-    private BasketService BasketService { get; set; }
+    private BasketService BasketService { get; set; } = default!;
 
     protected override void OnInitialized()
     {
         Basket = BasketService.Basket;
-        BasketService.OnChange += (sender, args) => StateHasChanged();
+        BasketService.OnChange += (sender, args) =>
+        {
+            Basket = args.Basket;
+            StateHasChanged();
+        };
     }
 
 
-    public void AddItem(MenuItemDto item)
+    public async Task AddItem(MenuItemDto item)
     {
-        Basket.MenuItems.Add(item);
-        StateHasChanged();
+        await BasketService.Add(item);
     }
 
-    public void Remove(MenuItemDto item)
+    public async Task RemoveItem(MenuItemDto item)
     {
-        Basket.MenuItems.Remove(item);
+        await BasketService.Remove(item);
     }
 
 
 }
+
+

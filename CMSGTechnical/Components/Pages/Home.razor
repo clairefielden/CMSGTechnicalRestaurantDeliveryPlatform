@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using CMSGTechnical.Code
 @using CMSGTechnical.Domain.Models
 @using CMSGTechnical.Mediator.Menu
@@ -8,13 +8,48 @@
 
 <PageTitle>Home</PageTitle>
 
-
-
-@for (var i = 0; i < MenuItems.Count(); i++) {
-    var item = MenuItems[i];
-    <MenuItemDisplay Item="@item" OnAdd="() => AddItem(i)" />
-}
-
+<div class="menu-categories">
+    @{
+        var caesarAddOn = MenuItems.FirstOrDefault(item => item.Name == "Add Chicken to Caesar Salad");
+        var carbonaraAddOn = MenuItems.FirstOrDefault(item => item.Name == "Add Beef Mince to Carbonara");
+        var menuItems = MenuItems.Where(item =>
+            item.Name != "Add Chicken to Caesar Salad" &&
+            item.Name != "Add Beef Mince to Carbonara");
+    }
+    @foreach (var group in menuItems.GroupBy(item => item.Category).OrderBy(group => group.Key))
+    {
+        var categoryName = group.Key.ToString();
+        var categorySlug = categoryName.ToLowerInvariant();
+        var categoryId = $"category-{categorySlug}";
+        var isExpanded = ExpandedCategories.Contains(categorySlug);
+        <section class="menu-category">
+            <button class="menu-category__header" type="button" aria-expanded="@isExpanded" @onclick="() => ToggleCategory(categorySlug)">
+                <div class="menu-category__label">
+                    <span class="menu-category__image menu-category__image--@categorySlug" aria-hidden="true"></span>
+                    <h2 class="menu-category__name">@categoryName</h2>
+                </div>
+                <span class="menu-category__toggle-icon" aria-hidden="true"></span>
+            </button>
+            <div class="menu-category__panel @(isExpanded ? string.Empty : "is-collapsed")" id="@categoryId">
+                <div class="menu-category__items">
+                    @foreach (var item in group.OrderBy(item => item.Price))
+                    {
+                        var addOnItem = item.Name switch
+                        {
+                            "Caesar Salad" => caesarAddOn,
+                            "Spaghetti Carbonara" => carbonaraAddOn,
+                            _ => null
+                        };
+                        <MenuItemDisplay Item="@item"
+                                         OnAdd="() => AddItem(item)"
+                                         AddOnItem="@addOnItem"
+                                         OnAddOn="() => AddAddOn(addOnItem)" />
+                    }
+                </div>
+            </div>
+        </section>
+    }
+</div>
 
 
 @code
@@ -24,18 +59,36 @@
 
     private MenuItemDto[] MenuItems { get; set; } = Array.Empty<MenuItemDto>();
     [CascadingParameter]
-    private BasketService Basket { get; set; }
+    private BasketService Basket { get; set; } = default!;
 
+    private HashSet<string> ExpandedCategories { get; } = new(StringComparer.Ordinal);
 
     protected override async Task OnInitializedAsync()
     {
         MenuItems = (await Mediator.Send(new GetMenuItems())).ToArray();
     }
 
-    private void AddItem(int id)
+    private async Task AddItem(MenuItemDto item)
     {
-        var menuItem = MenuItems.First(i=>i.Id==id);
-        Basket.Add(menuItem);
+        await Basket.Add(item);
+    }
+
+    private async Task AddAddOn(MenuItemDto? item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        await Basket.Add(item);
+    }
+
+    private void ToggleCategory(string categorySlug)
+    {
+        if (!ExpandedCategories.Add(categorySlug))
+        {
+            ExpandedCategories.Remove(categorySlug);
+        }
     }
     
 }

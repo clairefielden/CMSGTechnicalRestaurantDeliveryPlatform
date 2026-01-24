@@ -30,3 +30,9 @@ Below are a number of "tickets" that are needed to bring this site up to "MVP". 
 - Chocolate Cake's description isn't showing
 - The basket doesn't show £
 - The basket total doesn't add up correctly
+### Testing
+- Run unit tests: `dotnet test CMSGTechnical.Mediator.Tests/CMSGTechnical.Mediator.Tests.csproj`
+- Run all tests with coverage: `dotnet test CMSGTechnical.sln --collect:"XPlat Code Coverage"`
+
+### Bootstrap
+- UI uses Bootstrap styles from `CMSGTechnical/wwwroot/bootstrap/`; customize via scoped component CSS and `CMSGTechnical/wwwroot/app.css`.
